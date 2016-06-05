@@ -1,0 +1,16 @@
+C:\Users\e168211\Documents\Visual Studio 2010\Projects\Code2\Code2\bin\Debug\Code2.exe
+C:\Users\e168211\Documents\Visual Studio 2010\Projects\Code2\Code2\bin\Debug\Code2.pdb
+C:\Users\e168211\Documents\Visual Studio 2010\Projects\Code2\Code2\obj\x86\Debug\Code2.CodeMain.resources
+C:\Users\e168211\Documents\Visual Studio 2010\Projects\Code2\Code2\obj\x86\Debug\Code2.Properties.Resources.resources
+C:\Users\e168211\Documents\Visual Studio 2010\Projects\Code2\Code2\obj\x86\Debug\Code2.exe
+C:\Users\e168211\Documents\Visual Studio 2010\Projects\Code2\Code2\obj\x86\Debug\Code2.pdb
+C:\Users\e168211\Documents\Visual Studio 2010\Projects\Code2\Code2\obj\x86\Debug\Code2.csprojResolveAssemblyReference.cache
+C:\Users\e168211\Documents\Visual Studio 2010\Projects\Code2\Code2\obj\x86\Debug\Code2.csproj.GenerateResource.Cache
+C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.pdb
+C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\bin\Debug\Code2.exe
+C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\bin\Debug\Code2.pdb
+C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.csprojResolveAssemblyReference.cache
+C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.CodeMain.resources
+C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.Properties.Resources.resources
+C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.csproj.GenerateResource.Cache
+C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.exe
