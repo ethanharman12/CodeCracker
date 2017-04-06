@@ -26,6 +26,7 @@ namespace Code2
             InitializeComponent();
             this.ShowInTaskbar = false;
 
+            Timer = new GameTimer();
             CreateGuessForms(8);
             NewGame();
             
@@ -244,7 +245,8 @@ namespace Code2
         private void NewGame()
         {
             Game = new Game(8);
-            Timer = new GameTimer();
+            Timer.StartTime = null;
+            Timer.SecondsElapsed = 0;
             CurrentGuess = 0;
             DrawAnswers(Game);
         }
@@ -260,12 +262,14 @@ namespace Code2
 
             TotalGames++;
             TimePlayed += TimeSpan.FromSeconds(Timer.GetCurrentSecondsElapsed());
+            
             GameInProgress = false;
             contextMenuStrip1.Items[0].Text = "Total Games Played: " + TotalGames;
             contextMenuStrip1.Items[1].Text = "Total Time Played: " + TimePlayed;
             contextMenuStrip1.Items[2].Text = "Average: " + TimePlayed.TotalSeconds / TotalGames;      
 
             double secondsPlayed = (TimePlayed - LastTimePlayed).TotalSeconds;
+            LastTimePlayed = TimePlayed;
 
             TimeLabel.Text = "Time: " + secondsPlayed.ToString("F2");
             TimeLabel.Visible = true;
