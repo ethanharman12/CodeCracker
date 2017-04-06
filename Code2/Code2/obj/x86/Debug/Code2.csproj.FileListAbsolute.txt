@@ -14,3 +14,11 @@ C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x
 C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.Properties.Resources.resources
 C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.csproj.GenerateResource.Cache
 C:\Users\Ethan\Documents\Visual Studio 2013\Projects\Projects1\Code2\Code2\obj\x86\Debug\Code2.exe
+C:\Projects\CodeCracker\Code2\Code2\bin\Debug\Code2.exe
+C:\Projects\CodeCracker\Code2\Code2\obj\x86\Debug\Code2.csprojResolveAssemblyReference.cache
+C:\Projects\CodeCracker\Code2\Code2\obj\x86\Debug\Code2.CodeMain.resources
+C:\Projects\CodeCracker\Code2\Code2\obj\x86\Debug\Code2.Properties.Resources.resources
+C:\Projects\CodeCracker\Code2\Code2\obj\x86\Debug\Code2.csproj.GenerateResource.Cache
+C:\Projects\CodeCracker\Code2\Code2\obj\x86\Debug\Code2.exe
+C:\Projects\CodeCracker\Code2\Code2\obj\x86\Debug\Code2.pdb
+C:\Projects\CodeCracker\Code2\Code2\bin\Debug\Code2.pdb

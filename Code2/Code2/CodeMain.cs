@@ -1,149 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.IO;
 
 namespace Code2
 {
     public partial class CodeMain : Form
-    {
-        private string[] answers;
-
-        public string[] Answers
-        {
-            get { return answers; }
-            set { answers = value; }
-        }
-
-        public int AnswersAsInt
-        {
-            get
-            {
-                string totalAnswer = string.Empty;
-
-                foreach (var sting in Answers)
-                {
-                    totalAnswer += sting;
-                }
-
-                return int.Parse(totalAnswer);
-            }
-        }
-
-        private Dictionary<int, GameRecord> records;
-
-        public Dictionary<int, GameRecord> Records
-        {
-            get { return records; }
-            set { records = value; }
-        }
-
-        private int currentGuess;
-
-        public int CurrentGuess
-        {
-            get { return currentGuess; }
-            set { currentGuess = value; }
-        }
-
-        private bool gameInProgress;
-
-        public bool GameInProgress
-        {
-            get { return gameInProgress; }
-            set { gameInProgress = value; }
-        }        
-
-        private DateTime gameStart;
-
-        public DateTime GameStart
-        {
-            get { return gameStart; }
-            set { gameStart = value; }
-        }
-        
-        private Button[] guessButton;
-
-        public Button[] GuessButton
-        {
-            get { return guessButton; }
-            set { guessButton = value; }
-        }        
-
-        private ComboBox[][] guessCombo;
-
-        public ComboBox[][] GuessCombo
-        {
-            get { return guessCombo; }
-            set { guessCombo = value; }
-        }      
-
-        private Label[][] guessLabel;
-
-        public Label[][] GuessLabel
-        {
-            get { return guessLabel; }
-            set { guessLabel = value; }
-        }        
-
-        private TimeSpan timePlayed;
-
-        public TimeSpan TimePlayed
-        {
-            get { return timePlayed; }
-            set { timePlayed = value; }
-        }
-
-        private TimeSpan lastTimePlayed;
-
-        public TimeSpan LastTimePlayed
-        {
-            get { return lastTimePlayed; }
-            set { lastTimePlayed = value; }
-        }        
-
-        private int totalGames;
-
-        public int TotalGames
-        {
-            get { return totalGames; }
-            set { totalGames = value; }
-        }        
-
-        private int totalGuesses;
-
-        public int TotalGuesses
-        {
-            get { return totalGuesses; }
-            set { totalGuesses = value; }
-        }
+    {  
+        public Dictionary<int, GameRecord> Records { get; set; }
+        public int CurrentGuess { get; set; }
+        public Game Game { get; set; }
+        public bool GameInProgress { get; set; }
+        public Button[] GuessButton { get; set; }
+        public ComboBox[][] GuessCombo { get; set; }
+        public Label[][] GuessLabel { get; set; }
+        public TimeSpan TimePlayed { get; set; }
+        public TimeSpan LastTimePlayed { get; set; }
+        public GameTimer Timer { get; set; }
+        public int TotalGames { get; set; }
 
         public CodeMain()
         {
             InitializeComponent();
             this.ShowInTaskbar = false;
-            
+
+            CreateGuessForms(8);
             NewGame();
             
-            LoadRecords();
-            CreateGuessForms();      
+            Records = RecordsRepository.GetRecords();
             TotalGames = 0;
             TimePlayed = new TimeSpan(0);
             GameInProgress = false;
         }
 
-        private void CreateGuessForms()
+        private void CreateGuessForms(int totalGuesses)
         {
-            GuessCombo = new ComboBox[TotalGuesses][];
-            GuessLabel = new Label[TotalGuesses][];
-            GuessButton = new Button[TotalGuesses];
+            GuessCombo = new ComboBox[totalGuesses][];
+            GuessLabel = new Label[totalGuesses][];
+            GuessButton = new Button[totalGuesses];
 
-            for (int i = 0; i < TotalGuesses; i++)
+            for (int i = 0; i < totalGuesses; i++)
             {
                 GuessCombo[i] = new ComboBox[4];
                 GuessLabel[i] = new Label[4];
@@ -155,7 +53,7 @@ namespace Code2
                     GuessCombo[i][j].Location = new Point(40 + (60 * i), 20 + (40 * j));
                     GuessCombo[i][j].Enabled = (i == 0);
                     GuessCombo[i][j].MaxLength = 1;
-                    GuessCombo[i][j].Size = new System.Drawing.Size(30, 15);
+                    GuessCombo[i][j].Size = new Size(30, 15);
 
                     GuessCombo[i][j].TextChanged +=new EventHandler(FocusNext);
 
@@ -170,7 +68,7 @@ namespace Code2
                                                     : (j % 2 == 1)
                                                         ? new Point(55 + (60 * i), 225)   //3
                                                         : new Point(55 + (60 * i), 210);  //2
-                    GuessLabel[i][j].Size = new System.Drawing.Size(15, 15);
+                    GuessLabel[i][j].Size = new Size(15, 15);
 
                     this.Controls.Add(GuessCombo[i][j]);
                     this.Controls.Add(GuessLabel[i][j]);
@@ -181,93 +79,77 @@ namespace Code2
                 GuessButton[i].Text = "Confirm";
                 GuessButton[i].Click += new EventHandler(EvaluateGuess);
                 GuessButton[i].Enabled = (i == 0);
-                GuessButton[i].Size = new System.Drawing.Size(50, 20);
+                GuessButton[i].Size = new Size(50, 20);
 
                 this.Controls.Add(GuessButton[i]);
             }
 
-            Answer1.Location = new Point(60 + (60 * TotalGuesses), 20);
-            Answer2.Location = new Point(60 + (60 * TotalGuesses), 60);
-            Answer3.Location = new Point(60 + (60 * TotalGuesses), 100);
-            Answer4.Location = new Point(60 + (60 * TotalGuesses), 140);
-            ResetButton.Location = new Point(45 + (60 * TotalGuesses), 180);
+            Answer1.Location = new Point(60 + (60 * totalGuesses), 20);
+            Answer2.Location = new Point(60 + (60 * totalGuesses), 60);
+            Answer3.Location = new Point(60 + (60 * totalGuesses), 100);
+            Answer4.Location = new Point(60 + (60 * totalGuesses), 140);
+            ResetButton.Location = new Point(45 + (60 * totalGuesses), 180);
+            PauseButton.Location = new Point(95 + (60 * totalGuesses), 180);
+            PauseButton.Visible = false;
 
-            TimeLabel.Location = new Point(30 + (60 * TotalGuesses), 214);
-            AverageLabel.Location = new Point(34 + (60 * TotalGuesses), 230);
+            TimeLabel.Location = new Point(30 + (60 * totalGuesses), 214);
+            AverageLabel.Location = new Point(34 + (60 * totalGuesses), 230);
 
-            FastLabel.Location = new Point(100 + (60 * TotalGuesses), 214);
-            SlowLabel.Location = new Point(100 + (60 * TotalGuesses), 230);
+            FastLabel.Location = new Point(100 + (60 * totalGuesses), 214);
+            SlowLabel.Location = new Point(100 + (60 * totalGuesses), 230);
 
-            this.Size = new Size(190 + (60 * TotalGuesses), 300);
+            this.Size = new Size(190 + (60 * totalGuesses), 300);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
-
-        private void CreateRandomAnswers()
+        
+        private void ClearGame()
         {
-            Random rand = new Random();
-
-            string[] temp = new string[4];
-
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < GuessCombo.Length; i++)
             {
-                temp[i] = ((int)(rand.NextDouble() * 6) + 1).ToString();
+                for (int j = 0; j < 4; j++)
+                {
+                    GuessCombo[i][j].SelectedIndex = 0;
+                    GuessCombo[i][j].Enabled = (i == 0);
+                    GuessLabel[i][j].BackColor = Color.White;
+                }
+                GuessButton[i].Enabled = (i == 0);
             }
 
-            Answers = temp;
+            Answer1.BackColor = Color.Black;
+            Answer2.BackColor = Color.Black;
+            Answer3.BackColor = Color.Black;
+            Answer4.BackColor = Color.Black;
 
-            Answer1.Text = temp[0].ToString();
-            Answer2.Text = temp[1].ToString();
-            Answer3.Text = temp[2].ToString();
-            Answer4.Text = temp[3].ToString();
+            AverageLabel.Visible = false;
+            TimeLabel.Visible = false;
+            FastLabel.Visible = false;
+            SlowLabel.Visible = false;            
+        }
+
+        private void DrawAnswers(Game game)
+        {
+            Answer1.Text = game.Answers[0].ToString();
+            Answer2.Text = game.Answers[1].ToString();
+            Answer3.Text = game.Answers[2].ToString();
+            Answer4.Text = game.Answers[3].ToString();
+
+            GuessCombo[0][0].Focus();
         }
 
         private void EvaluateGuess(object sender, EventArgs e)
         {
-            if (CurrentGuess == 0)
+            if(Timer.StartTime == null)
             {
-                GameStart = DateTime.Now;
-                GameInProgress = true;
-                LastTimePlayed = TimePlayed;
+                Timer.Start();
+                PauseButton.Visible = true;
             }
 
-            List<int> completeCorrect = new List<int>();
-            int wrongSpot = 0;
+            var evaluatedGuesses = Game.EvaluateGuess(GuessCombo[CurrentGuess].Select(combo => int.Parse(combo.Text)).ToArray());
 
-            for (int i = 0; i < 4; i++)
-            {
-                if (GuessCombo[CurrentGuess][i].Text == Answers[i])
-                {
-                    completeCorrect.Add(i);
-                }
-            }
+            FillLabels(evaluatedGuesses.Item1, evaluatedGuesses.Item2);
 
-            List<string> unusedGuesses = new List<string>();
-            List<string> unusedAnswers = new List<string>();
-
-            for (int i = 0; i < 4; i++)
-            {
-                if (!completeCorrect.Contains(i))
-                {
-                    unusedGuesses.Add(GuessCombo[CurrentGuess][i].Text);
-                    unusedAnswers.Add(Answers[i]);
-                }
-            }
-
-            foreach (string i in unusedGuesses.Distinct())
-            {
-                int gCount = unusedGuesses.Count(ug => ug == i);
-                int aCount = unusedAnswers.Count(ua => ua == i);
-
-                for (int j = 0; j < Math.Min(gCount, aCount); j++)
-                {
-                    wrongSpot++;//not the actual index
-                }
-            }
-
-            FillLabels(completeCorrect.Count, wrongSpot);
-
-            if (completeCorrect.Count == 4)
+            if (evaluatedGuesses.Item1 == 4)
             {
                 ShowAnswers();
                 GuessButton[CurrentGuess].Enabled = false;
@@ -300,41 +182,40 @@ namespace Code2
         {
             this.SelectNextControl((Control)sender, true, true, false, false);
         }
-
-        private void LoadRecords()
+        
+        private int GetAnswersAsInt(int[] answers)
         {
-            Records = new Dictionary<int, GameRecord>();
-            if (File.Exists(Path.Combine(Path.GetTempPath(), "CodeRecords.txt")))
+            var totalAnswer = string.Empty;
+
+            foreach (var answer in answers)
             {
-                var stringRecords = File.ReadAllLines(Path.Combine(Path.GetTempPath(), "CodeRecords.txt"));
+                totalAnswer += answer.ToString();
+            }
 
-                foreach (var sting in stringRecords)
+            return int.Parse(totalAnswer);
+        }
+
+        private void HideBoard()
+        {
+            GuessButton[CurrentGuess].Enabled = false;
+
+            for (int i = 0; i < 4; i++)
+            {
+                GuessCombo[CurrentGuess][i].Enabled = false;
+            }
+
+            for(int i = 0; i < CurrentGuess; i++)
+            {
+                for(int j = 0; j < 4; j++)
                 {
-                    var sides = sting.Split(new string[] { ",=," }, StringSplitOptions.RemoveEmptyEntries);
-
-                    var key = Int32.Parse(sides[0]);
-                    var times = sides[1].Split(',');
-
-                    List<double> values = new List<double>();
-                    foreach (var time in times)
-                    {
-                        values.Add(Double.Parse(time));
-                    }
-
-                    Records[key] = new GameRecord(values);
+                    GuessLabel[i][j].Visible = false;
                 }
             }
         }
 
-        private void NewGame()
-        {
-            CurrentGuess = 0;
-            TotalGuesses = 8;            
-            CreateRandomAnswers();
-        }
-
         private void NextGuess()
         {
+            GameInProgress = true;
             for (int j = 0; j < 4; j++)
             {
                 GuessCombo[CurrentGuess][j].Enabled = false;
@@ -342,7 +223,7 @@ namespace Code2
 
             GuessButton[CurrentGuess].Enabled = false;
 
-            if (CurrentGuess < TotalGuesses - 1)
+            if (CurrentGuess < Game.TotalGuesses - 1)
             {
                 CurrentGuess++;
 
@@ -359,22 +240,13 @@ namespace Code2
                 ShowAnswers();
             }
         }
-
-        private void SaveRecords()
+        
+        private void NewGame()
         {
-            string serializedRecords = string.Empty;
-
-            foreach (var rec in Records)
-            {
-                serializedRecords += rec.Key + ",=";
-                foreach (var time in rec.Value.Times)
-                {
-                    serializedRecords += ',' + time.ToString("F2");
-                }
-                serializedRecords += Environment.NewLine;
-            }
-
-            File.WriteAllText(Path.Combine(Path.GetTempPath(), "CodeRecords.txt"), serializedRecords);
+            Game = new Game(8);
+            Timer = new GameTimer();
+            CurrentGuess = 0;
+            DrawAnswers(Game);
         }
 
         private void ShowAnswers()
@@ -387,7 +259,7 @@ namespace Code2
             ResetButton.Focus();
 
             TotalGames++;
-            TimePlayed += DateTime.Now.Subtract(GameStart);
+            TimePlayed += TimeSpan.FromSeconds(Timer.GetCurrentSecondsElapsed());
             GameInProgress = false;
             contextMenuStrip1.Items[0].Text = "Total Games Played: " + TotalGames;
             contextMenuStrip1.Items[1].Text = "Total Time Played: " + TimePlayed;
@@ -399,52 +271,52 @@ namespace Code2
             TimeLabel.Visible = true;
 
             AverageLabel.Text = "Avg: " + (TimePlayed.TotalSeconds / TotalGames).ToString("F2");
-            AverageLabel.Visible = true;                      
+            AverageLabel.Visible = true;
 
-            if (!Records.ContainsKey(AnswersAsInt))
+            var answersKey = GetAnswersAsInt(Game.Answers);
+
+            if (!Records.ContainsKey(answersKey))
             {
-                Records.Add(AnswersAsInt, new GameRecord(new List<double>() { secondsPlayed }));
+                Records.Add(answersKey, new GameRecord(new List<double>() { secondsPlayed }));
             }
             else
             {
-                FastLabel.Text = "Fast: " + Records[AnswersAsInt].Fastest.ToString("F2");
-                SlowLabel.Text = "Slow: " + Records[AnswersAsInt].Slowest.ToString("F2");
+                FastLabel.Text = "Fast: " + Records[answersKey].Fastest.ToString("F2");
+                SlowLabel.Text = "Slow: " + Records[answersKey].Slowest.ToString("F2");
 
                 FastLabel.Visible = true;
-                if (Records[AnswersAsInt].Fastest != Records[AnswersAsInt].Slowest)
+                if (Records[answersKey].Fastest != Records[answersKey].Slowest)
                 {
                     SlowLabel.Visible = true;
                 }
 
-                Records[AnswersAsInt].AddTime(secondsPlayed);
+                Records[answersKey].AddTime(secondsPlayed);
             }            
         }        
 
-        private void ResetButton_Click(object sender, EventArgs e)
+        private void ShowBoard()
         {
-            NewGame();            
+            GuessButton[CurrentGuess].Enabled = true;
 
-            for (int i = 0; i < TotalGuesses; i++)
+            for (int i = 0; i < 4; i++)
+            {
+                GuessCombo[CurrentGuess][i].Enabled = true;
+            }
+
+            for (int i = 0; i < CurrentGuess; i++)
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    GuessCombo[i][j].SelectedIndex = 0;
-                    GuessCombo[i][j].Enabled = (i == 0);
-                    GuessLabel[i][j].BackColor = Color.White;
+                    GuessLabel[i][j].Visible = true;
                 }
-                GuessButton[i].Enabled = (i == 0);
             }
+        }
 
-            Answer1.BackColor = Color.Black;
-            Answer2.BackColor = Color.Black;
-            Answer3.BackColor = Color.Black;
-            Answer4.BackColor = Color.Black;
-
-            AverageLabel.Visible = false;
-            TimeLabel.Visible = false;
-            FastLabel.Visible = false;
-            SlowLabel.Visible = false;
-            GuessCombo[0][0].Focus();
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            this.PauseButton.Visible = false;
+            ClearGame();
+            NewGame();
         }
 
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
@@ -464,21 +336,52 @@ namespace Code2
 
         private void CodeMain_Deactivate(object sender, EventArgs e)
         {
-            if (GameInProgress)
+            if (GameInProgress && contextMenuStrip1.Items.Count > 0)
             {
-                TimePlayed += DateTime.Now.Subtract(GameStart);
+                TimePlayed += TimeSpan.FromSeconds(Timer.GetCurrentSecondsElapsed());
                 contextMenuStrip1.Items[1].Text = "Total Time Played: " + TimePlayed;
             }
         }
 
         private void CodeMain_Activated(object sender, EventArgs e)
         {
-            GameStart = DateTime.Now;
+            if (GameInProgress)
+            {
+                Timer.GetCurrentSecondsElapsed();
+                Timer.Start();
+            }
         }
 
         private void CodeMain_FormClosed(object sender, FormClosedEventArgs e)
         {
-            SaveRecords();
+            RecordsRepository.SaveRecords(Records);
+        }
+
+        private void PauseButton_Click(object sender, EventArgs e)
+        {
+            if(GameInProgress) //pause
+            {
+                Timer.Pause();
+                GameInProgress = false;
+                PauseButton.Text = "Resume";
+                PauseButton.Width = 80;
+                HideBoard();
+            }
+            else //resume
+            {
+                GameInProgress = true;
+                PauseButton.Text = "Pause";
+                PauseButton.Width = 70;
+                ShowBoard();
+                if(CurrentGuess > 0)
+                {
+                    Timer.Start();
+                    GuessCombo[CurrentGuess][0].Focus();
+                }
+            }
+
+            //this.ResumeLayout(true);
+            //this.PerformLayout();
         }
     }
 }
